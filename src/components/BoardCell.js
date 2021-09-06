@@ -1,11 +1,11 @@
 import React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 
 
-const BoardCell = ({value, onCellValueChanged}) =>{
+const BoardCell = ({value, onCellValueChanged, isActive, onSetActive}) =>{
 
-  const [focus, setFocus] = useState(false)
+  // const [focus, setFocus] = useState(false)
 
   const cellEl = useRef(null);
 
@@ -13,33 +13,15 @@ const BoardCell = ({value, onCellValueChanged}) =>{
     onCellValueChanged(e.target.value)
   }
 
-  useEffect(()=>{
-    document.body.addEventListener('click', (e)=>{
-      if(cellEl.current.contains(e.target)){
-        return;
-      }
-      setFocus(false);
-    },
-    {capture: true})
-
-    document.body.addEventListener('focus', (e)=>{
-      if(cellEl.current.contains(e.target)){
-        setFocus(true);
-      }else{
-        setFocus(false);
-      }
-    },
-    {capture: true})
-  }, [])
 
   useEffect(()=>{
-    if(focus){
-      console.log(cellEl.current.querySelector('input').focus())
+    if(isActive){
+      cellEl.current.querySelector('input').focus()
     }
-  }, [focus])
+  }, [isActive])
 
-  return <div className="board-cell" ref={cellEl} onClick={()=>setFocus(true)}>
-    {focus ? <input value={value ===  null ? '' : value}  onChange={onValueChanged}/> : <button >{value === null ? <span>&nbsp;</span>: value}</button>}
+  return <div className="board-cell" ref={cellEl} onClick={()=>onSetActive()} onFocus={()=>onSetActive()}>
+    {isActive ? <input value={value ===  null ? '' : value}  onChange={onValueChanged}/> : <button >{value === null ? <span>&nbsp;</span>: value}</button>}
   </div>
 }
 

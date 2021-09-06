@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {getEmptyBoard, solverGenerator, getNumberCellsCount} from '../services/sudokuGen'
 import './Board.scss'
 import BoardCell from './BoardCell';
@@ -8,7 +8,11 @@ const Board = () => {
 
   const [board, setBoard] = useState(getEmptyBoard())
 
+  const boardEl = useRef(null)
+
   const [resultShow, setResultShow] = useState(false)
+
+  const [activeCell, setActiveCell] = useState([null, null]);
 
   const [myInterval, setMyInterval] = useState(null)
 
@@ -27,9 +31,46 @@ const Board = () => {
     }
   }
 
+  useEffect(() => {
+    document.body.addEventListener('click', (e) =>{
+      if(!boardEl.current.contains(e.target)){
+        setActiveCell([null, null])
+      }
+    });
+  }, [])
+
+  useEffect(() => {
+    function activeCellListenser(e){
+      function setActiveCallIfValid(newCell){
+        if(newCell[0] >= 0 && newCell[0] <= 8 && newCell[1] >= 0 && newCell[1] <= 8){
+          setActiveCell(newCell)
+        }
+      }
+      if(e.code === 'ArrowDown'){
+        const newActiveCell = [ activeCell[0]+1, activeCell[1] ]
+        setActiveCallIfValid(newActiveCell)
+      }
+      if(e.code === 'ArrowUp'){
+        const newActiveCell = [ activeCell[0]-1, activeCell[1] ]
+        setActiveCallIfValid(newActiveCell)
+      }
+      if(e.code === 'ArrowRight'){
+        const newActiveCell = [ activeCell[0], activeCell[1]+1 ]
+        setActiveCallIfValid(newActiveCell)
+      }
+      if(e.code === 'ArrowLeft'){
+        const newActiveCell = [ activeCell[0], activeCell[1]-1 ]
+        setActiveCallIfValid(newActiveCell)
+      }
+    }
+    const el = boardEl.current;
+    el.addEventListener('keydown', activeCellListenser);
+
+    return (()=> el.removeEventListener('keydown', activeCellListenser));
+  })
 
   const onGenerate = ()=>{
-
+    setActiveCell([null, null])
     function startSolving(){
       const newBoard = JSON.parse(JSON.stringify(board));
       try{
@@ -69,12 +110,22 @@ const Board = () => {
     setBoard(getEmptyBoard())
   }
 
+  function isActiveCell(rowIndex, colIndex){
+    return (rowIndex === activeCell[0] && colIndex === activeCell[1])
+  }
+
   return (<div className="ui four column centered grid">
     <div className="two column row">
-        <div className="board">
+        <div className="board" ref={boardEl}>
         {board.map((row, rowIndex)=>{
           return (<div key={rowIndex} className="board-row">
-            {row.map((col, colIndex) => <BoardCell key={colIndex} value={col} onCellValueChanged={onCellValueChanged(rowIndex, colIndex)}/>)}
+            {row.map((col, colIndex) => <BoardCell  key={colIndex} 
+                                                    value={col} 
+                                                    onCellValueChanged={onCellValueChanged(rowIndex, colIndex)} 
+                                                    isActive={isActiveCell(rowIndex, colIndex)} 
+                                                    onSetActive={()=>setActiveCell([rowIndex, colIndex])}
+                                                    onSetNoActive={()=>setActiveCell([null, null])}
+                                                  />)}
             </div>)
         })}
       </div>
