@@ -8,6 +8,8 @@ const Board = () => {
 
   const [board, setBoard] = useState(getEmptyBoard())
 
+  const [resultShow, setResultShow] = useState(false)
+
   const onCellValueChanged = (rowIndex, colIndex, value) =>{
     return function(value){
       value = +value;
@@ -25,19 +27,35 @@ const Board = () => {
 
   const onGenerate = ()=>{
     const newBoard = JSON.parse(JSON.stringify(board));
-    const result = solver(newBoard);
-   setBoard(result)
+    try{
+      const result = solver(newBoard);
+
+      setResultShow(true)
+      setBoard(result)
+    }catch{
+      alert("I can't solve the impossible#!@#!@$")
+    }
   }
 
-  return (<div>
-      <div className="board">
-      {board.map((row, rowIndex)=>{
-        return (<div key={rowIndex} className="board-row">
-          {row.map((col, colIndex) => <BoardCell key={colIndex} value={col} onCellValueChanged={onCellValueChanged(rowIndex, colIndex)}/>)}
-          </div>)
-      })}
+  const onReset = () =>{
+    setResultShow(false)
+    setBoard(getEmptyBoard())
+  }
+
+  return (<div className="ui four column centered grid">
+    <div className="two column row">
+        <div className="board">
+        {board.map((row, rowIndex)=>{
+          return (<div key={rowIndex} className="board-row">
+            {row.map((col, colIndex) => <BoardCell key={colIndex} value={col} onCellValueChanged={onCellValueChanged(rowIndex, colIndex)}/>)}
+            </div>)
+        })}
+      </div>
     </div>
-    <button onClick={onGenerate}>Generate</button>
+    <div className="">
+      <button className="ui button" onClick={onGenerate} disabled={resultShow}>Generate</button>
+      <button className="ui button" onClick={onReset}>Reset</button>
+    </div>
   </div>)
 }
 
