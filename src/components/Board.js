@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import {getEmptyBoard, solver} from '../services/sudokuGen'
+import {getEmptyBoard, solverGenerator, getNumberCellsCount} from '../services/sudokuGen'
 import './Board.scss'
 import BoardCell from './BoardCell';
 
@@ -9,6 +9,8 @@ const Board = () => {
   const [board, setBoard] = useState(getEmptyBoard())
 
   const [resultShow, setResultShow] = useState(false)
+
+  const [myInterval, setMyInterval] = useState(null)
 
   const onCellValueChanged = (rowIndex, colIndex, value) =>{
     return function(value){
@@ -25,19 +27,44 @@ const Board = () => {
     }
   }
 
-  const onGenerate = ()=>{
-    const newBoard = JSON.parse(JSON.stringify(board));
-    try{
-      const result = solver(newBoard);
 
-      setResultShow(true)
-      setBoard(result)
-    }catch{
-      alert("I can't solve the impossible#!@#!@$")
+  const onGenerate = ()=>{
+
+    function startSolving(){
+      const newBoard = JSON.parse(JSON.stringify(board));
+      try{
+        setResultShow(true)
+        const generator = solverGenerator(newBoard);
+        const interval = setInterval(()=>{
+          const next = generator.next();
+          setBoard(JSON.parse(JSON.stringify(next.value)))
+          if(next.done){
+            clearInterval(interval);
+            setMyInterval(null)
+          }
+        }, 1)
+        setMyInterval(interval)
+      }catch{
+        alert("I can't solve the impossible#!@#!@$")
+      }
     }
+
+    if(getNumberCellsCount(board) < 17){
+      if(window.confirm(`If less than 17, there maybe more than 1 unqiue solutions` )){
+        startSolving();
+      }
+      
+    }else{
+      startSolving();
+    }
+    
   }
 
   const onReset = () =>{
+    if(myInterval){
+      clearInterval(myInterval);
+      setMyInterval(null)
+    }
     setResultShow(false)
     setBoard(getEmptyBoard())
   }

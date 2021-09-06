@@ -104,8 +104,56 @@ export const solver = (board) => {
   return board;
 }
 
+export const getNumberCellsCount = (board) => {
+  return board.reduce((res, row)=>{
+    return res + row.filter(col => col).length
+  }, 0)
+}
+
+
+function* solverGenerator(board){
+  function nextValue(value){
+    if (value === null)
+      return 1;
+    return value + 1;
+  }
+
+  const length = board.length;
+
+  const emptyCells = getEmptyCells(board);
+  let cur = 0;
+  while (cur < emptyCells.length) {
+    yield board;
+    if (cur < 0) {
+      throw new Error("No Solution");
+    }
+
+    const row = emptyCells[cur][0];
+    const col = emptyCells[cur][1];
+
+    let v = nextValue(board[row][col])
+    while (v < length + 1) {
+      board[row][col] = v;
+      if (isRowValid(board, row) && isColValid(board, col) && isSquareValid(board, row, col)) {
+        break;
+      }
+      v = nextValue(board[row][col])
+    }
+    if (v > length) {
+      board[row][col] = null;
+      cur--;
+
+    } else {
+      cur++;
+    }
+
+  }
+  return board;
+}
 
 
 export const getEmptyBoard= ()=>{
   return new Array(9).fill(new Array(9).fill(null))
 }
+
+export {solverGenerator}
