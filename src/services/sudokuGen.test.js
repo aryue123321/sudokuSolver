@@ -164,3 +164,58 @@ test('genartor2 Test', () => {
   }
   while(!next.done)
 });
+
+test('genartor2 from empty cells', () => {
+
+  const b = sg.getEmptyBoard();
+
+  const generator = sg.solver2Generator(b);
+  let next = null;
+  do{
+    next = generator.next();
+  }
+  while(!next.done)
+
+  console.log(next.value);
+
+  const res = [
+    [
+      1, 2, 3, 4, 5,
+      6, 7, 8, 9
+    ],
+    [
+      4, 5, 6, 7, 8,
+      9, 1, 2, 3
+    ],
+    [
+      7, 8, 9, 1, 2,
+      3, 4, 5, 6
+    ],
+    [
+      2, 1, 4, 3, 6,
+      5, 8, 9, 7
+    ],
+    [
+      3, 6, 5, 8, 9,
+      7, 2, 1, 4
+    ],
+    [
+      8, 9, 7, 2, 1,
+      4, 3, 6, 5
+    ],
+    [
+      5, 3, 1, 6, 4,
+      2, 9, 7, 8
+    ],
+    [
+      6, 4, 2, 9, 7,
+      8, 5, 3, 1
+    ],
+    [
+      9, 7, 8, 5, 3,
+      1, 6, 4, 2
+    ]
+  ]
+
+  expect(b).toEqual(res);
+});

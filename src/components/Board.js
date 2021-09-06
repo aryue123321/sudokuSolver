@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import {getEmptyBoard, solverGenerator, getNumberCellsCount} from '../services/sudokuGen'
+import {getEmptyBoard, solver2Generator, getNumberCellsCount, isBoardValid} from '../services/sudokuGen'
 import './Board.scss'
 import BoardCell from './BoardCell';
 
@@ -70,12 +70,18 @@ const Board = () => {
   })
 
   const onGenerate = ()=>{
+    
+    if(!isBoardValid(board)){
+      alert("I can't solve the impossible#!@#!@$");
+      return;
+    }
+
     setActiveCell([null, null])
     function startSolving(){
       const newBoard = JSON.parse(JSON.stringify(board));
       
         setResultShow(true)
-        const generator = solverGenerator(newBoard);
+        const generator = solver2Generator(newBoard);
         const interval = setInterval(()=>{
           try{
           const next = generator.next();
@@ -85,7 +91,7 @@ const Board = () => {
             setMyInterval(null)
           }
         }catch{
-          alert("I can't solve the impossible#!@#!@$");
+          alert("????");
           clearInterval(interval);
           setMyInterval(null)
         }

@@ -1,3 +1,4 @@
+
 const rowWrapper = (board, rowPos, callBack) => {
   const row = board[rowPos];
   return callBack(row);
@@ -113,6 +114,22 @@ const getNextEmptyCell= (board) =>{
 }
 
 
+export const isBoardValid = (board)=>{
+  for(let i = 0; i < board.length; i++){
+    if(!isRowValid(board, i))
+      return false;
+    if(!isColValid(board, i))
+      return false;
+  }
+  for(let i = 0; i < board.length; i+=3){
+    for(let j = 0; j < board.length; j+=3){
+      if(!isSquareValid(board, i, j))
+        return false;
+    }
+  }
+  return true;
+}
+
 export const fillFirstRow = (board) => {
   const length = board.length;
   for (let i = 0; i < length; i++) {
@@ -221,12 +238,12 @@ function* solver2Generator(board){
 
   const emptyCells = [];
   let nextEmptyCell = getNextEmptyCell(board);
-  emptyCells.push(nextEmptyCell);
+  // emptyCells.push(nextEmptyCell);
   while (nextEmptyCell) {
     yield board;
-    if (!emptyCells.length) {
-      throw new Error("No Solution");
-    }
+    // if (!emptyCells.length) {
+    //   throw new Error("No Solution");
+    // }
 
     const row = nextEmptyCell.pos[0];
     const col = nextEmptyCell.pos[1];
@@ -245,7 +262,7 @@ function* solver2Generator(board){
 
     } else {
       nextEmptyCell = getNextEmptyCell(board);
-      emptyCells.push(nextEmptyCell)
+      emptyCells.push({pos:[row, col]})
     }
 
   }
@@ -253,7 +270,7 @@ function* solver2Generator(board){
 }
 
 export const getEmptyBoard= ()=>{
-  return new Array(9).fill(new Array(9).fill(null))
+  return new Array(9).fill(0).map(() => new Array(9).fill(null))
 }
 
 export {solverGenerator, solver2Generator}
