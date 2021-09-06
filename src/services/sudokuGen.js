@@ -43,14 +43,22 @@ const isSquareValid = (board, rowPos, colPos) =>{
 }
 
 
-const getEmptyCells = (board) => {
-  // const b = JSON.parse(JSON.stringify(board));
+export const getEmptyCells = (board) => {
   const res = new Array(0);
+
+  const rowSeqenceDict = board.map((row, rowIndex) => {
+    return {
+      index: rowIndex,
+      count: row.filter((col) => col).length
+    }
+  }).sort((a, b) => b.count - a.count);
+
   const length = board.length;
   for (let i = 0; i < length; i++) {
+    const rowIndex = rowSeqenceDict[i].index;
     for (let j = 0; j < length; j++) {
-      if (board[i][j] === null) {
-        res.push([i, j])
+      if (board[rowIndex][j] === null) {
+        res.push([rowIndex, j])
       }
     }
   }
