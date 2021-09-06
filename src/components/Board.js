@@ -73,27 +73,30 @@ const Board = () => {
     setActiveCell([null, null])
     function startSolving(){
       const newBoard = JSON.parse(JSON.stringify(board));
-      try{
+      
         setResultShow(true)
         const generator = solverGenerator(newBoard);
         const interval = setInterval(()=>{
+          try{
           const next = generator.next();
           setBoard(JSON.parse(JSON.stringify(next.value)))
           if(next.done){
             clearInterval(interval);
             setMyInterval(null)
           }
-        }, 1)
-        setMyInterval(interval)
-      }catch{
-        alert("I can't solve the impossible#!@#!@$")
-      }
+        }catch{
+          alert("I can't solve the impossible#!@#!@$");
+          clearInterval(interval);
+          setMyInterval(null)
+        }
+      }, 1)
+      setMyInterval(interval)
     }
 
     if(getNumberCellsCount(board) < 17){
-      if(window.confirm(`If less than 17, there maybe more than 1 unqiue solutions` )){
+      // if(window.confirm(`If less than 17, there maybe more than 1 unqiue solutions` )){
         startSolving();
-      }
+      // }
       
     }else{
       startSolving();

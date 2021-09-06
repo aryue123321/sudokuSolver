@@ -44,6 +44,7 @@ const isSquareValid = (board, rowPos, colPos) =>{
 
 
 const getEmptyCells = (board) => {
+  // const b = JSON.parse(JSON.stringify(board));
   const res = new Array(0);
   const length = board.length;
   for (let i = 0; i < length; i++) {
