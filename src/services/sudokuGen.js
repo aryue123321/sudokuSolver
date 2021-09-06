@@ -1,24 +1,17 @@
-const isCombinationValid = (arr) => {
-  const filtered = arr.filter(x => x !== null);
-  const set = new Set(filtered);
-  return filtered.length === set.size;
-}
-
-const isRowValid = (board, rowPos) => {
+const rowWrapper = (board, rowPos, callBack) => {
   const row = board[rowPos];
-  return isCombinationValid(row);
+  return callBack(row);
 }
 
-const isColValid = (board, colPos) => {
+const colWrapper = (board, colPos, callBack) => {
   const length = board.length;
   const col = new Array(length);
   for (let i = 0; i < length; i++) {
     col.push(board[i][colPos]);
   }
-  return isCombinationValid(col);
+  return callBack(col);
 }
-
-const isSquareValid = (board, rowPos, colPos) =>{
+const squareWrapper = (board, rowPos, colPos, callBack) => {
   const size = Math.sqrt(board.length);
 
   function getSeqmentArray(pos) {
@@ -38,8 +31,43 @@ const isSquareValid = (board, rowPos, colPos) =>{
       arrTobeValidated.push(board[r][c]);
     }
   }
+  return callBack(arrTobeValidated);
+}
 
-  return isCombinationValid(arrTobeValidated);
+
+const isCombinationValid = (arr) => {
+  const filtered = arr.filter(x => x !== null);
+  const set = new Set(filtered);
+  return filtered.length === set.size;
+}
+
+const getNumberOfCellsHasValue = (arr) =>{
+  return arr.filter((x, i) => x).length;
+}
+
+const isRowValid = (board, rowPos) => {
+  return rowWrapper(board, rowPos, isCombinationValid)
+}
+
+const isColValid = (board, colPos) => {
+  
+  return colWrapper(board, colPos, isCombinationValid);
+}
+
+const isSquareValid = (board, rowPos, colPos) =>{
+  return squareWrapper(board, rowPos, colPos, isCombinationValid);
+}
+
+const getRowFilledCount = (board, rowPos) =>{
+  return rowWrapper(board, rowPos, getNumberOfCellsHasValue);
+}
+
+const getColFilledCount = (board, colPos) =>{
+  return colWrapper(board, colPos, getNumberOfCellsHasValue);
+}
+
+const getSquareFilledCount = (board, rowPos, colPos) =>{
+  return squareWrapper(board, rowPos, colPos, getNumberOfCellsHasValue);
 }
 
 
@@ -64,6 +92,26 @@ export const getEmptyCells = (board) => {
   }
   return res;
 }
+
+const getNextEmptyCell= (board) =>{
+  const length = board.length;
+  const arr = [];
+  for (let i = 0; i < length; i++) {
+    for (let j = 0; j < length; j++) {
+      if (board[i][j] === null) {
+        arr.push([i, j])
+      }
+    }
+  }
+  if(!arr.length){
+    return null;
+  }
+  const weightedArr = arr.map(x => {
+    return {pos: x, score: getRowFilledCount(board, x[0]) + getColFilledCount(board, x[1]) + getSquareFilledCount(board, x[0], x[1]) }
+  }).sort((a, b) => b.score - a.score);
+  return weightedArr[0];
+}
+
 
 export const fillFirstRow = (board) => {
   const length = board.length;
@@ -119,7 +167,7 @@ export const getNumberCellsCount = (board) => {
   }, 0)
 }
 
-
+// backtracking - solve by row has highest filled counts first
 function* solverGenerator(board){
   function nextValue(value){
     if (value === null)
@@ -161,8 +209,51 @@ function* solverGenerator(board){
 }
 
 
+// backtracking - solve by finding the next empty cells with the highest score first
+function* solver2Generator(board){
+  function nextValue(value){
+    if (value === null)
+      return 1;
+    return value + 1;
+  }
+
+  const length = board.length;
+
+  const emptyCells = [];
+  let nextEmptyCell = getNextEmptyCell(board);
+  emptyCells.push(nextEmptyCell);
+  while (nextEmptyCell) {
+    yield board;
+    if (!emptyCells.length) {
+      throw new Error("No Solution");
+    }
+
+    const row = nextEmptyCell.pos[0];
+    const col = nextEmptyCell.pos[1];
+
+    let v = nextValue(board[row][col])
+    while (v < length + 1) {
+      board[row][col] = v;
+      if (isRowValid(board, row) && isColValid(board, col) && isSquareValid(board, row, col)) {
+        break;
+      }
+      v = nextValue(board[row][col])
+    }
+    if (v > length) {
+      board[row][col] = null;
+      nextEmptyCell = emptyCells.pop();
+
+    } else {
+      nextEmptyCell = getNextEmptyCell(board);
+      emptyCells.push(nextEmptyCell)
+    }
+
+  }
+  return board;
+}
+
 export const getEmptyBoard= ()=>{
   return new Array(9).fill(new Array(9).fill(null))
 }
 
-export {solverGenerator}
+export {solverGenerator, solver2Generator}
