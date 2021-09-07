@@ -47,6 +47,18 @@ const Board = () => {
     return (()=>document.body.removeEventListener('click', clearActive))
   }, [])
 
+  useEffect(()=>{
+    function activeCellListenser(e){
+      if(e.code === 'Enter' || e.code === 'NumpadEnter'){
+        setActiveCell([null, null])
+        onGenerate()
+      }
+    }
+    const el = boardEl.current;
+    el.addEventListener('keydown', activeCellListenser);
+    return (()=> el.removeEventListener('keydown', activeCellListenser));
+  })
+
   useEffect(() => {
     function activeCellListenser(e){
       function setActiveCallIfValid(newCell){
@@ -70,6 +82,7 @@ const Board = () => {
         const newActiveCell = [ activeCell[0], activeCell[1]-1 ]
         setActiveCallIfValid(newActiveCell)
       }
+      
     }
     const el = boardEl.current;
     el.addEventListener('keydown', activeCellListenser);
@@ -134,10 +147,10 @@ const Board = () => {
   }
 
   return (<div className="ui four column centered grid" style={{marginTop:'15px'}}>
-    <div class="ui right labeled input">
-      <label for="speed" class="ui label">Speed</label>
+    <div className="ui right labeled input">
+      <label htmlFor="speed" className="ui label">Speed</label>
       <input type="number" placeholder="Amount" id="speed" value={speed} min="1" max="5000" onChange={(e)=>setSpeed(+e.target.value)} disabled={IsGenerating}/>
-      <div class="ui basic label">ms</div>
+      <div className="ui basic label">ms</div>
     </div>
     <div className="two column row">
       <div className="board" ref={boardEl}>
