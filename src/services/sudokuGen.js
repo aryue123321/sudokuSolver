@@ -240,7 +240,7 @@ function* solver2Generator(board){
   let nextEmptyCell = getNextEmptyCell(board);
   // emptyCells.push(nextEmptyCell);
   while (nextEmptyCell) {
-    yield board;
+    
     // if (!emptyCells.length) {
     //   throw new Error("No Solution");
     // }
@@ -264,6 +264,7 @@ function* solver2Generator(board){
       nextEmptyCell = getNextEmptyCell(board);
       emptyCells.push({pos:[row, col]})
     }
+    yield board;
 
   }
   return board;

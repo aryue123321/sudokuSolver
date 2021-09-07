@@ -9,9 +9,11 @@ const Board = () => {
 
   const [board, setBoard] = useState(getEmptyBoard())
 
+  const [speed, setSpeed] = useState(50);
+
   const boardEl = useRef(null)
 
-  const [resultShow, setResultShow] = useState(false)
+  const [IsGenerating, setIsGenerating] = useState(false)
 
   const [activeCell, setActiveCell] = useState([null, null]);
 
@@ -86,7 +88,7 @@ const Board = () => {
     function startSolving(){
       const newBoard = JSON.parse(JSON.stringify(board));
       
-        setResultShow(true)
+        setIsGenerating(true)
         const generator = solver2Generator(newBoard);
         const interval = setInterval(()=>{
           try{
@@ -102,7 +104,7 @@ const Board = () => {
           clearInterval(interval);
           setMyInterval(null)
         }
-      }, 1)
+      }, speed)
       setMyInterval(interval)
     }
 
@@ -123,7 +125,7 @@ const Board = () => {
       setMyInterval(null)
     }
     setCount(0)
-    setResultShow(false)
+    setIsGenerating(false)
     setBoard(getEmptyBoard())
   }
 
@@ -131,9 +133,14 @@ const Board = () => {
     return (rowIndex === activeCell[0] && colIndex === activeCell[1])
   }
 
-  return (<div className="ui four column centered grid">
+  return (<div className="ui four column centered grid" style={{marginTop:'15px'}}>
+    <div class="ui right labeled input">
+      <label for="speed" class="ui label">Speed</label>
+      <input type="number" placeholder="Amount" id="speed" value={speed} min="1" max="5000" onChange={(e)=>setSpeed(+e.target.value)} disabled={IsGenerating}/>
+      <div class="ui basic label">ms</div>
+    </div>
     <div className="two column row">
-        <div className="board" ref={boardEl}>
+      <div className="board" ref={boardEl}>
         {board.map((row, rowIndex)=>{
           return (<div key={rowIndex} className="board-row">
             {row.map((col, colIndex) => <BoardCell  key={colIndex} 
@@ -149,7 +156,7 @@ const Board = () => {
     </div>
     <div className="">
     <Counter count={count}/>
-      <button className="ui button" onClick={onGenerate} disabled={resultShow}>Generate</button>
+      <button className="ui button" onClick={onGenerate} disabled={IsGenerating}>Generate</button>
       <button className="ui button" onClick={onReset}>Reset</button>
       
     </div>
