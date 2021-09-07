@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import {getEmptyBoard, solver2Generator, getNumberCellsCount, isBoardValid} from '../services/sudokuGen'
 import './Board.scss'
 import BoardCell from './BoardCell';
+import Counter from './Counter'
 
 const Board = () => {
 
@@ -15,6 +16,8 @@ const Board = () => {
   const [activeCell, setActiveCell] = useState([null, null]);
 
   const [myInterval, setMyInterval] = useState(null)
+
+  const [count, setCount] = useState(0);
 
   const onCellValueChanged = (rowIndex, colIndex, value) =>{
     return function(value){
@@ -89,6 +92,7 @@ const Board = () => {
           try{
           const next = generator.next();
           setBoard(JSON.parse(JSON.stringify(next.value)))
+          setCount(count=>count+1);
           if(next.done){
             clearInterval(interval);
             setMyInterval(null)
@@ -118,6 +122,7 @@ const Board = () => {
       clearInterval(myInterval);
       setMyInterval(null)
     }
+    setCount(0)
     setResultShow(false)
     setBoard(getEmptyBoard())
   }
@@ -143,8 +148,10 @@ const Board = () => {
       </div>
     </div>
     <div className="">
+    <Counter count={count}/>
       <button className="ui button" onClick={onGenerate} disabled={resultShow}>Generate</button>
       <button className="ui button" onClick={onReset}>Reset</button>
+      
     </div>
   </div>)
 }
