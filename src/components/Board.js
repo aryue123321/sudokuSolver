@@ -9,7 +9,7 @@ const Board = () => {
 
   const [board, setBoard] = useState(getEmptyBoard())
 
-  const [speed, setSpeed] = useState(50);
+  const [speed, setSpeed] = useState(30);
 
   const boardEl = useRef(null)
 
@@ -149,6 +149,7 @@ const Board = () => {
                                                     isActive={isActiveCell(rowIndex, colIndex)} 
                                                     onSetActive={()=>setActiveCell([rowIndex, colIndex])}
                                                     onSetNoActive={()=>setActiveCell([null, null])}
+                                                    isDisable={IsGenerating}
                                                   />)}
             </div>)
         })}

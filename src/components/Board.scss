@@ -19,6 +19,9 @@
         button{
           border-color: white;
         }
+        button:disabled{
+          color: black;
+        }
     }
     .board-cell:nth-of-type(3n):not(:last-child){
       border-right: 2px solid black;
