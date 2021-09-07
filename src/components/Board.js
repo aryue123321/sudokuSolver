@@ -32,11 +32,14 @@ const Board = () => {
   }
 
   useEffect(() => {
-    document.body.addEventListener('click', (e) =>{
+    function clearActive(e){
       if(!boardEl.current.contains(e.target)){
         setActiveCell([null, null])
       }
-    });
+    }
+    document.body.addEventListener('click', clearActive);
+
+    return (()=>document.body.removeEventListener('click', clearActive))
   }, [])
 
   useEffect(() => {
@@ -67,7 +70,7 @@ const Board = () => {
     el.addEventListener('keydown', activeCellListenser);
 
     return (()=> el.removeEventListener('keydown', activeCellListenser));
-  })
+  }, [activeCell])
 
   const onGenerate = ()=>{
     

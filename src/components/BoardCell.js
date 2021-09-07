@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 
 
 
-const BoardCell = ({value, onCellValueChanged, isActive, onSetActive}) =>{
+const BoardCell = ({value, onCellValueChanged, isActive, onSetActive, onSetNoActive}) =>{
 
   // const [focus, setFocus] = useState(false)
 
@@ -20,7 +20,7 @@ const BoardCell = ({value, onCellValueChanged, isActive, onSetActive}) =>{
     }
   }, [isActive])
 
-  return <div className="board-cell" ref={cellEl} onClick={()=>onSetActive()} onFocus={()=>onSetActive()}>
+  return <div className="board-cell" ref={cellEl} onClick={()=>onSetActive()} onFocus={()=>onSetActive()} onBlur={()=>onSetNoActive()}>
     {isActive ? <input value={value ===  null ? '' : value}  onChange={onValueChanged}/> : <button >{value === null ? <span>&nbsp;</span>: value}</button>}
   </div>
 }
